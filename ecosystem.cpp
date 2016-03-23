@@ -1,0 +1,143 @@
+#include <stdio.h>
+#include "mpi.h"
+#include "pool.h"
+#include "squirrel-functions.h"
+#include "ran2.h"
+#include <iostream>
+#include "cellClass.h"
+#include "squirrelClass.h"
+#include "clockClass.h"
+#include "parameters.h" 
+using namespace std;
+
+
+static void workerCode();
+static void masterCode();
+void squirrelCode();
+void gridCode();
+void clockTime();
+void receiveLoop(Cell gridPoint);
+
+
+int main(int argc, char* argv[]) {
+
+	MPI_Init(&argc, &argv);
+	int statusCode = processPoolInit();
+	int tempRank; 
+	MPI_Comm_rank(MPI_COMM_WORLD, &tempRank);
+
+	if (statusCode == 1 && tempRank < NUM_EXTRA_ACTORS + NUM_SQUIRRELS + NUM_CELLS) { //Workers have statusCode==1
+		workerCode();
+	}
+
+	else if (statusCode == 2) { //Master has statusCode==2
+		masterCode();
+	}		
+	processPoolFinalise();
+	MPI_Finalize();
+
+	return 0;
+}
+
+static void masterCode() {
+	int myRank, parentId;
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+
+	for(int j = 0; j < 1 + NUM_EXTRA_ACTORS + NUM_CELLS + NUM_SQUIRRELS; j++) {
+		int workerPid = startWorkerProcess();
+	}
+	
+/*
+	int workerPid = startWorkerProcess();
+
+	for(int i=0; i<NUM_CELLS; i++) {
+		int workerPid = startWorkerProcess();
+	}
+	for(int i=0; i<NUM_SQUIRRELS; i++) {
+		int workerPid = startWorkerProcess();		
+	}
+//*/	
+	clockTime();
+}	
+
+
+static void workerCode() {
+		int myRank, parentId;
+		MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+		
+		/*
+		if(myRank == 1) {
+			controllerCode(); // To keep track of the living squirrels etc
+		}	
+		//*/	
+
+		if(myRank > NUM_EXTRA_ACTORS && myRank <= NUM_EXTRA_ACTORS + NUM_CELLS) {
+			gridCode();
+		}	
+		
+		else if(myRank > NUM_EXTRA_ACTORS + NUM_CELLS) {
+			squirrelCode();
+		}
+}
+
+
+void clockTime() {
+	Clock masterProcess;
+	masterProcess.timer();
+
+}
+
+void gridCode() {
+	Cell gridPoint;
+	gridPoint.run();	
+	receiveLoop(gridPoint);
+/*
+	int pop = gridPoint.getPopulationInflux();
+	int inf = gridPoint.getInfectionLevel();	
+	int r = gridPoint.getRank();
+	printf("eco: Cell %d has pop %d and inf %d \n", r, pop, inf);
+//*/
+}
+
+
+void receiveLoop(Cell gridPoint) {
+	int flag = 0;
+	MPI_Status status;
+	while(gridPoint.getSimulation()) { //while simulation in process - global variable?
+		MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
+		if(flag == 1) {			
+			gridPoint.receiveInfo();
+			gridPoint.printStatus();
+			flag = 0;
+		}
+	}
+}
+
+
+
+void squirrelCode(){
+	Squirrel initial;
+	
+	initial.run();
+	while(initial.getSimulation()) {
+		initial.updateStep();
+		initial.getSquirrelCell();	
+		initial.squirrelToCell();
+		initial.updateValues();
+		initial.giveBirth();
+		initial.willSquirrelDie();	
+/*
+		printf("birth = %d death = %d rank = %d \n", initial.getBirthValue(), initial.getDeathValue(), initial.getRank());
+		if(initial.getDeathValue() == 1) {
+			printf("Squirrel %d will die \n", initial.getRank());
+		}
+		else if(initial.getDeathValue() == 0) {
+			printf("Squirrel %d does not die here\n", initial.getRank());
+		}
+
+*/
+		initial.receive();
+
+	}
+}
+
