@@ -25,13 +25,13 @@ void Clock::timer() {
 		printf("Rank %d shutting down pool \n", rank);
 		shutdownPool();
 		sleep(2);
-		poisonPill(); //Poison cells explicilty after a while
+		poisonPill();
 }
 
 void Clock::endMonth(){
 	for(int a=2; a <= 1 + NUM_CELLS; a++) {
 		MPI_Send(&month, 1, MPI_INT, a, 888, MPI_COMM_WORLD);
-		//printf("Sent month to cell %d \n", a);
+		printf("Sent month to cell %d \n", a);
 	}
 }
 
@@ -41,6 +41,6 @@ void Clock::poisonPill() {
 	sleep(2);
 	for(a = 2; a <= 1 + NUM_CELLS; a++) {
 		MPI_Send(&poison, 1, MPI_INT, a, 999, MPI_COMM_WORLD);
-	//	printf("Sent poison to cell %d \n", a);
+		printf("Sent poison to cell %d \n", a);
 	}	
 }

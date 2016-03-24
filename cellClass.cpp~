@@ -49,7 +49,6 @@ void Cell::receiveInfo() {
 		if(incomingMessage == 1) {
 			infectionLevelCurrent++;
 		}
-	printf("Cell %d has pop %d and inf %d \n", rank, populationInflux, infectionLevel);
 	}
 	if(tag == 888) {
 		MPI_Recv(&month, 1, MPI_INT, sender, 888, MPI_COMM_WORLD, &status);

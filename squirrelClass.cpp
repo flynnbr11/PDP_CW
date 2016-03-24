@@ -43,7 +43,7 @@ void Squirrel::run() {
 }
 
 void Squirrel::getSquirrelCell() {
-	cellRank = 1 + getCellFromPosition(x,y);
+	cellRank = 2 + getCellFromPosition(x,y);
 }
 
 void Squirrel::squirrelToCell() {
@@ -55,7 +55,7 @@ void Squirrel::squirrelToCell() {
 	populationRecentCells[numSteps % 50 ] = populationCurrentCell;
 	infectionRecentCells[numSteps % 50] = infectionCurrentCell;
 		
-//	printf("Squirrel %d is on cell %d with pop %d and inf %d \n", rank, cellRank, populationCurrentCell, infectionCurrentCell);
+	printf("Squirrel %d is on cell %d with pop %d and inf %d \n", rank, cellRank, populationCurrentCell, infectionCurrentCell);
 }
 
 void Squirrel::receive() {
@@ -67,7 +67,8 @@ void Squirrel::receive() {
 		tag = status.MPI_TAG;
 
 		if(tag == 999) {
-			MPI_Recv(&simulationRunning, 1, MPI_INT, 0, 999, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			MPI_Recv(&simulationRunning, 1, MPI_INT, sender, 999, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	//		printf("Received poison S %d \n", rank);
 			simulationRunning = 0;
 		}
 		else printf("probe gives Tag = %d \n", tag);
@@ -143,6 +144,9 @@ int Squirrel:: getDeathValue() {
 	return death;
 }
 
+int Squirrel::getInfectedValue() {
+	return infected;
+}	
 
 
 

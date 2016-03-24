@@ -43,6 +43,7 @@ class Squirrel
 		void giveBirth();
 		int getBirthValue();
 		int getDeathValue();
+		int getInfectedValue();
 		void willSquirrelDie();
 };
 
