@@ -49,7 +49,7 @@ void Cell::receiveInfo() {
 		if(incomingMessage == 1) {
 			infectionLevelCurrent++;
 		}
-	printf("Cell %d has pop %d and inf %d \n", rank, populationInflux, infectionLevel);
+	//printf("Cell %d has pop %d and inf %d \n", rank, populationInflux, infectionLevel);
 	}
 	if(tag == 888) {
 		MPI_Recv(&month, 1, MPI_INT, sender, 888, MPI_COMM_WORLD, &status);
@@ -59,7 +59,7 @@ void Cell::receiveInfo() {
 	}
 	if(tag == 999) { // poison pill
 		MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
-	//	printf("Received poison cell %d \n", rank);
+		//printf("Received poison cell %d \n", rank);
 		simulationRunning = 0;
 	}
 }

@@ -1,7 +1,7 @@
 CC = mpic++ -w
 #CC = mpic++ -Wno-write-strings
 CC_C = mpicc
-OBJ= ecosystem.cpp squirrelClass.cpp cellClass.cpp ran2.c squirrel-functions.c pool.c clockClass.cpp
+OBJ= ecosystem.cpp squirrelClass.cpp cellClass.cpp ran2.c squirrel-functions.c pool.c clockClass.cpp trackerClass.cpp nurseClass.cpp
 LIB = -lm 
 
 eco : $(OBJ)
@@ -9,4 +9,5 @@ eco : $(OBJ)
 
 clean : 
 	rm eco
-
+	rm *.o
+	rm *~
