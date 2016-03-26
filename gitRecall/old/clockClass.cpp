@@ -24,15 +24,6 @@ void Clock::timer() {
 		sleep(1);
 		endMonth();
 		printf("month = %d num squirrels = %d \n", month, numLivingSquirrels);			
-
-//	MPI_Iprobe(TRACKER_RANK, 799, MPI_COMM_WORLD, &flag, &status);
-//	if(flag == 1){
-//		printf("Clock received message too many squirrels \n");
-//		MPI_Recv(&incomingMessage, 1, MPI_INT, TRACKER_RANK, 799, MPI_COMM_WORLD, &status);
-//		month = NUM_MONTHS;
-//		flag =0;
-//	}
-
 	}
 //		if(shouldWorkerStop()==0) {
 //			printf("clock Rank %d shutting down pool \n", rank);

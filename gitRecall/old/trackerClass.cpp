@@ -77,6 +77,7 @@ void Tracker::counter() {
 			else if(tag == 773) { //squirrels are shutting down
 				MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);						
 				numShutDownSquirrels ++;			
+				printf("Tracker received shut down message from S %d\n", sender);
 				printf("Tracker: numShutDownSquirrels = %d  numLiving = %d\n", numShutDownSquirrels, numLivingSquirrels);
 				if(numShutDownSquirrels == numLivingSquirrels) {
 
