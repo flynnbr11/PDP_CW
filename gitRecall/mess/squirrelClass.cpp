@@ -53,15 +53,15 @@ void Squirrel::getSquirrelCell() {
 void Squirrel::squirrelToCell() {
 	MPI_Status status;
 	int incomingMessage=-1;
-	printf("S %d mpi_send 1 \n", rank);
+	////printf("S %d mpi_send 1 \n", rank);
 	MPI_Ssend(&infected, 1, MPI_INT, cellRank, 111, MPI_COMM_WORLD);
-	printf("S %d mpi_rec 1 \n", rank);
+	////printf("S %d mpi_rec 1 \n", rank);
 	MPI_Recv(&infectionCurrentCell, 1, MPI_INT, cellRank, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	
 	MPI_Recv(&populationCurrentCell, 1, MPI_INT, cellRank, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);		
 	populationRecentCells[numSteps % 50 ] = populationCurrentCell;
 	infectionRecentCells[numSteps % 50] = infectionCurrentCell;
 		
-	printf("S %d is on cell %d with pop %d and inf %d \n", rank, cellRank, populationCurrentCell, infectionCurrentCell);
+	////printf("S %d is on cell %d with pop %d and inf %d \n", rank, cellRank, populationCurrentCell, infectionCurrentCell);
 }
 
 void Squirrel::receive() {
@@ -74,10 +74,10 @@ void Squirrel::receive() {
 
 		if(tag == 999) {
 			MPI_Recv(&simulationRunning, 1, MPI_INT, sender, 999, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	//		printf("Received poison S %d \n", rank);
+	//		////printf("Received poison S %d \n", rank);
 			simulationRunning = 0;
 		}
-		else printf("probe gives Tag = %d \n", tag);
+		else ////printf("probe gives Tag = %d \n", tag);
 		flag = 0;	
 	} 
 }
@@ -98,7 +98,7 @@ void Squirrel::receiveInfectionLevel() {
 	MPI_Recv(&populationCurrentCell, 1, MPI_INT, cellRank, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 	populationRecentCells[numSteps % 50 ] = populationCurrentCell;
 	infectionRecentCells[numSteps % 50] = infectionCurrentCell;
-	printf("S %d on cell %d which has infection %d and population %d \n", rank, cellRank, infectionCurrentCell, populationCurrentCell);
+	////printf("S %d on cell %d which has infection %d and population %d \n", rank, cellRank, infectionCurrentCell, populationCurrentCell);
 }
 
 int Squirrel::getSimulation() {
@@ -118,28 +118,30 @@ void Squirrel::updateValues() {
 
 void Squirrel::giveBirth() {
 	int workingPid;
-	printf("S %d At start of give birth fnc birth = %d \n", rank, birth);
+	////printf("S %d At start of give birth fnc birth = %d \n", rank, birth);
 	birth = 0;
-	if(numSteps % 50 ==0) {
+	if(numSteps % 50 == 0) {
 		birth = willGiveBirth(avgPopInflux, &state);
 	
-		printf("S %d in give birth fnc birth = %d \n", rank, birth);
+		////printf("S %d in give birth fnc birth = %d \n", rank, birth);
 
-		if(birth == 1 and shouldWorkerStop() == 0) {
-			printf("S %d inside if birth = 1 in birth func\n ", rank);
+		if(birth == 1 && shouldWorkerStop() == 0) {
+			////printf("S %d inside if birth = 1 in birth func\n ", rank);
+			//printf("S %d before starting new worker \n", rank);
 			workingPid = startWorkerProcess();
-			printf("S %d Giving birth to rank %d \n", rank, workingPid);	
+			//printf("S %d after starting new worker \n", rank);
+			////printf("S %d Giving birth to rank %d \n", rank, workingPid);	
 		
-			printf("S %d mpi_send 2 \n", rank);
+			//printf("S %d mpi_send 2 \n", rank);
 			MPI_Ssend(&workingPid, 1, MPI_INT, TRACKER_RANK, 778, MPI_COMM_WORLD);
-			printf("S %d mpi_rec 2 \n", rank);
+			//printf("S %d mpi_rec 2 \n", rank);
 	
 		}
 	}
 	else {
-		printf("S %d will not give birth here \n", rank);
+		////printf("S %d will not give birth here \n", rank);
 	}
-	printf("S %d At end of give birth fnc birth = %d \n", rank, birth);
+	////printf("S %d At end of give birth fnc birth = %d \n", rank, birth);
 }
 
 int Squirrel::willSquirrelDie() {
@@ -155,9 +157,9 @@ int Squirrel::willSquirrelDie() {
 		if(numSteps - infectedStep > 50) {
 			death = willDie(&state);
 			if(death == 1){
-				printf("S %d mpi_send 3 \n", rank);
+				////printf("S %d mpi_send 3 \n", rank);
 				MPI_Ssend(&death, 1, MPI_INT, TRACKER_RANK, 777, MPI_COMM_WORLD);
-				printf("S %d mpi_rec 3 \n", rank);
+				////printf("S %d mpi_rec 3 \n", rank);
 				infected = 0;
 			}
 		}

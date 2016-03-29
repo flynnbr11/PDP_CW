@@ -36,6 +36,7 @@ int main(int argc, char* argv[]) {
 
 	else if (statusCode == 2) { //Master has statusCode==2
 		masterCode();
+		printf("Master finishing\n");
 	}		
 	processPoolFinalise();
 	MPI_Finalize();
@@ -53,7 +54,7 @@ static void masterCode() {
 	for(int j = 0; j < NUM_CELLS + NUM_SQUIRRELS + 2; j++) {
 		int workerPid = startWorkerProcess();
 	}
-	printf("master done making threads\n");
+	//printf("master done making threads\n");
 	
 //*
 	do{ 
@@ -72,20 +73,20 @@ static void workerCode() {
 		
 
 		if(myRank > NUM_EXTRA_ACTORS  && myRank <= NUM_EXTRA_ACTORS  + NUM_CELLS) {
-			//printf("I am cell %d \n", myRank);
+			////printf("I am cell %d \n", myRank);
 			gridCode();
 			printf("Cell %d finishing\n", myRank);
 		}	
 		
 //		else if(myRank > NUM_CELLS + NUM_EXTRA_ACTORS && myRank <= NUM_EXTRA_ACTORS  + NUM_CELLS + NUM_SQUIRRELS) {
 		else if(myRank > NUM_CELLS + NUM_EXTRA_ACTORS) {
-			//printf("I am S %d \n", myRank);
+			////printf("I am S %d \n", myRank);
 			squirrelCode();
 			printf("S %d finishing\n", myRank);
 		}
 		//*
 		else if(myRank == CLOCK_RANK) {
-			//printf("I am the clock\n");
+			////printf("I am the clock\n");
 			clockTime(); // To keep track of the living squirrels etc
 			printf("Clock %d finishing\n", myRank);
 		}	
@@ -131,7 +132,7 @@ void receiveLoop(Cell gridPoint) {
 		}
 //		stop = shouldWorkerStop();
 	}
-//	printf("Cell %d out of loop \n", gridPoint.getRank());
+//	//printf("Cell %d out of loop \n", gridPoint.getRank());
 }
 
 
@@ -144,60 +145,46 @@ void squirrelCode(){
 	int myRank = initial.getRank();
 	initial.run();
 	while (continueSim == 1 ) {
-		printf("S %d at start of continue loop \n", initial.getRank());
+		//printf("S %d at start of continue loop \n", initial.getRank());
 		stop = 0;
 		while(stop==0) {
 			if(shouldWorkerStop () == 1) {
 				break; //break out of while(stop)
 				stop = 1;
 			}
-			printf("S %d inside stop loop \n", initial.getRank());
-			printf("S %d update step \n", initial.getRank());		
 			initial.updateStep();
-			printf("S %d getSquirrelCell \n", initial.getRank());		
 			initial.getSquirrelCell();	
-			printf("S %d squirrelToCell \n", initial.getRank());		
 			initial.squirrelToCell();
-			printf("S %d updateValues \n", initial.getRank());		
 			initial.updateValues();
-			printf("S %d giveBirth \n", initial.getRank());		
-//			if(shouldWorkerStop() == 1) break;
+			//printf("S %d going into give birth fnc\n", myRank);
 			initial.giveBirth();
-			printf("S %d willSquirrelDie \n", initial.getRank());
-			willDie = initial.willSquirrelDie();	
-			if(willDie == 1) {
+			//printf("S %d out of give birth fnc\n", myRank);
+//			willDie = initial.willSquirrelDie();	
+//			if(willDie == 1) {
+//				stop = 1;
+//				//printf("S %d breaking bc dead \n", initial.getRank());
+//			}
+//			
+//			if (willDie != 1) {
+//				//printf("S %d checking whether to stop \n", initial.getRank());
+//				stop = shouldWorkerStop();
+//				}
+			if(initial.willSquirrelDie() || shouldWorkerStop() ) { 
 				stop = 1;
-				printf("S %d breaking bc dead \n", initial.getRank());
+				//printf("on S %d stopping \n", myRank);
 			}
-
-			printf("birth = %d inf = %d death = %d rank = %d \n", initial.getBirthValue(), initial.getInfectedValue(), willDie, initial.getRank());
-			//initial.receive();
-			printf("S %d will Die if statement \n", initial.getRank());		
-			
-			if (willDie != 1) {
-				printf("S %d checking whether to stop \n", initial.getRank());
-				stop = shouldWorkerStop();
-				}
-			printf("S %d if stop == 1\n", initial.getRank());		
-			if(stop == 1) {
-				printf( "stop = 1 on rank %d\n", initial.getRank());
-			} 
-			printf("At end of stop loop rank %d \n", initial.getRank());
-		
-			//skipToEnd:
 		}
-		
-		
-		printf("rank %d going to sleep \n", initial.getRank());
+			
+		//printf("rank %d going to sleep \n", initial.getRank());
 		continueSim = workerSleep();
-		printf("S %d cont = %d stop = %d \n", initial.getRank(), continueSim, stop);
+		//printf("S %d cont = %d stop = %d \n", initial.getRank(), continueSim, stop);
 	
 		if(continueSim == 0){
-			printf("S %d sending shut down to tracker \n", initial.getRank());
-			printf("eco mpi_send 1 \n");
+			//printf("S %d sending shut down to tracker \n", initial.getRank());
+			//printf("eco mpi_send 1 \n");
 			MPI_Ssend(&myRank, 1, MPI_INT, TRACKER_RANK, 773, MPI_COMM_WORLD);
-			printf("eco mpi_rec 1 \n");
+			//printf("eco mpi_rec 1 \n");
 		}
 	}
-	//printf("Rank %d closing\n", initial.getRank());
+	////printf("Rank %d closing\n", initial.getRank());
 }
