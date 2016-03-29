@@ -35,46 +35,58 @@ int Cell::getRank() {
 
 void Cell::receiveInfo() {
 	MPI_Status status;
-	MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-	sender = status.MPI_SOURCE;
-	tag = status.MPI_TAG;
-//	MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
-	if(tag == 111) { // tag 1 corresponds to squirrel-cell comms
-		MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
-		//printf("cell mpi_send 1 \n");
-		MPI_Ssend(&infectionLevel, 1, MPI_INT, sender, 112, MPI_COMM_WORLD);
-		//printf("cell mpi_rec 1 \n");
-		//printf("cell mpi_send 2 \n");
-		MPI_Ssend(&populationInflux, 1, MPI_INT, sender, 113, MPI_COMM_WORLD);
-		//printf("cell mpi_rec 2 \n");
+	int flag = 0;
+	while(simulationRunning) {
+		MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
+		if(flag == 1) {			
 
-//		sendValues(); 
+			MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+			sender = status.MPI_SOURCE;
+			tag = status.MPI_TAG;
+			if(tag == 111) { // tag 1 corresponds to squirrel-cell comms
+				informSquirrel(sender, tag, status);
+			}
+			if(tag == 888) { //month
+				monthlyUpdates(sender, tag, status);
+			}
+			if(tag == 999) { // poison pill
+				receivePoison(sender, tag, status);
+			}
+			flag = 0;
+		}
+	}
+}
+
+void Cell::receivePoison (int sender, int tag, MPI_Status status) {
+		MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
+		simulationRunning = 0;
+}
+
+
+
+void Cell::informSquirrel(int sender, int tag, MPI_Status status) {
+		MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
+//		MPI_Ssend(&cellValues, 2, MPI_INT, sender, 112, MPI_COMM_WORLD);	
+		MPI_Ssend(&infectionLevel, 1, MPI_INT, sender, 112, MPI_COMM_WORLD);
+		MPI_Ssend(&populationInflux, 1, MPI_INT, sender, 113, MPI_COMM_WORLD);
 		populationInfluxCurrent++;
 		if(incomingMessage == 1) {
 			infectionLevelCurrent++;
 		}
-	//printf("Cell %d has pop %d and inf %d \n", rank, populationInflux, infectionLevel);
-	}
-	if(tag == 888) {
-		MPI_Recv(&month, 1, MPI_INT, sender, 888, MPI_COMM_WORLD, &status);
-	//	//printf("Received MONTH --- cell %d \n", rank);
-		monthlyUpdates();
-		
-	}
-	if(tag == 999) { // poison pill
-		MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
-	//	//printf("Received poison cell %d \n", rank);
-		simulationRunning = 0;
-	}
 }
 
-void Cell::monthlyUpdates() {
+
+
+void Cell::monthlyUpdates(int sender, int tag, MPI_Status status) {
+	MPI_Recv(&month, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
 	populationInfluxRecentMonths[month%3] = populationInfluxCurrent; // overwrite oldest each time
 	infectionLevelRecentMonths[month%2] = infectionLevelCurrent;
 	populationInfluxCurrent = 0;
 	infectionLevelCurrent = 0;
 	infectionLevel = infectionLevelRecentMonths[0] + infectionLevelRecentMonths[1];
 	populationInflux = populationInfluxRecentMonths[0] + populationInfluxRecentMonths[1] + populationInfluxRecentMonths[2];
+	cellValues[0] = populationInflux;
+	cellValues[1] = infectionLevel;
 }
 
 int Cell::getInfectionLevel() {
@@ -103,17 +115,9 @@ void Cell::receiveWhileRunning() {
 	}
 }
 
-void Cell::printStatus() {
-//	//printf("printStatus: Cell %d has populationInflux %d and infectionLevel %d \n", rank, populationInfluxCurrent, infectionLevelCurrent);
-}
-
 void Cell::sendValues() {
-	//printf("cell mpi_send 3 \n");
 	MPI_Ssend(&infectionLevel, 1, MPI_INT, sender, 112, MPI_COMM_WORLD);
-	//printf("cell mpi_rec 3 \n");
-	//printf("cell mpi_send 4 \n");
 	MPI_Ssend(&populationInflux, 1, MPI_INT, sender, 113, MPI_COMM_WORLD);
-	//printf("cell mpi_rec 4 \n");
 }
 
 int Cell::getIncomingMessage() {

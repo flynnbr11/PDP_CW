@@ -27,6 +27,8 @@ class Squirrel
 		int eligibleToDie;
 		int flag;
 		int tag;
+		int cellValues[2];
+		float pos[2];
 	public: 
 		Squirrel(); // constructor 
 		void run();
