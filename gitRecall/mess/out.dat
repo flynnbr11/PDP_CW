@@ -1,0 +1,138 @@
+S 19 my parent was 0. Initial inf = 0 
+S 21 my parent was 0. Initial inf = 0 
+S 28 my parent was 0. Initial inf = 1 
+S 30 my parent was 0. Initial inf = 0 
+S 34 my parent was 0. Initial inf = 0 
+S 29 my parent was 0. Initial inf = 0 
+S 22 my parent was 0. Initial inf = 0 
+S 24 my parent was 0. Initial inf = 1 
+S 26 my parent was 0. Initial inf = 0 
+S 27 my parent was 0. Initial inf = 0 
+S 31 my parent was 0. Initial inf = 0 
+S 32 my parent was 0. Initial inf = 1 
+S 20 my parent was 0. Initial inf = 1 
+S 23 my parent was 0. Initial inf = 0 
+S 25 my parent was 0. Initial inf = 0 
+S 33 my parent was 0. Initial inf = 0 
+Month = 1. Number of squirrels = 16 Number Infected = 4 
+Month = 2. Number of squirrels = 16 Number Infected = 4 
+Month = 3. Number of squirrels = 16 Number Infected = 4 
+S 34 catching infection 
+Squirrel 20 has died, pop now = 15 
+Squirrel 28 has died, pop now = 14 
+Squirrel 32 has died, pop now = 13 
+Squirrel 27 has given birth to rank 20, pop now = 14 
+Newborn 20 from parent 27. My starting position is x = 0.510859 y=0.093660 
+S 20 my parent was 27. Initial inf = 0 
+Month = 4. Number of squirrels = 14 Number Infected = 2 
+Squirrel 24 has died, pop now = 13 
+S 20 catching infection 
+Month = 5. Number of squirrels = 13 Number Infected = 2 
+Month = 6. Number of squirrels = 13 Number Infected = 2 
+Squirrel 23 has given birth to rank 24, pop now = 14 
+Newborn 24 from parent 23. My starting position is x = 0.707698 y=0.379530 
+S 24 my parent was 23. Initial inf = 0 
+Month = 7. Number of squirrels = 14 Number Infected = 2 
+Squirrel 34 has died, pop now = 13 
+Squirrel 20 has died, pop now = 12 
+Month = 8. Number of squirrels = 12 Number Infected = 0 
+Month = 9. Number of squirrels = 12 Number Infected = 0 
+Month = 10. Number of squirrels = 12 Number Infected = 0 
+S 21 catching infection 
+Month = 11. Number of squirrels = 12 Number Infected = 1 
+Month = 12. Number of squirrels = 12 Number Infected = 1 
+Month = 13. Number of squirrels = 12 Number Infected = 1 
+Squirrel 23 has given birth to rank 20, pop now = 13 
+Newborn 20 from parent 23. My starting position is x = 0.226494 y=0.590752 
+S 20 my parent was 23. Initial inf = 0 
+Squirrel 21 has died, pop now = 12 
+Month = 14. Number of squirrels = 12 Number Infected = 0 
+Squirrel 27 has given birth to rank 21, pop now = 13 
+Newborn 21 from parent 27. My starting position is x = 0.323134 y=0.002654 
+S 21 my parent was 27. Initial inf = 0 
+S 20 catching infection 
+Month = 15. Number of squirrels = 13 Number Infected = 1 
+S 30 catching infection 
+Squirrel 25 has given birth to rank 28, pop now = 14 
+Newborn 28 from parent 25. My starting position is x = 0.610776 y=0.600659 
+S 28 my parent was 25. Initial inf = 0 
+Month = 16. Number of squirrels = 14 Number Infected = 2 
+Month = 17. Number of squirrels = 14 Number Infected = 2 
+Squirrel 27 has given birth to rank 32, pop now = 15 
+Newborn 32 from parent 27. My starting position is x = 0.016260 y=0.503022 
+S 32 my parent was 27. Initial inf = 0 
+Squirrel 20 has died, pop now = 14 
+Month = 18. Number of squirrels = 14 Number Infected = 1 
+S 22 catching infection 
+Month = 19. Number of squirrels = 14 Number Infected = 2 
+S 19 catching infection 
+Squirrel 19 has given birth to rank 20, pop now = 15 
+Newborn 20 from parent 19. My starting position is x = 0.900118 y=0.411502 
+S 20 my parent was 19. Initial inf = 0 
+Squirrel 30 has died, pop now = 14 
+Month = 20. Number of squirrels = 14 Number Infected = 2 
+S 20 catching infection 
+Month = 21. Number of squirrels = 14 Number Infected = 3 
+Squirrel 32 has given birth to rank 30, pop now = 15 
+Newborn 30 from parent 32. My starting position is x = 0.340082 y=0.825178 
+S 30 my parent was 32. Initial inf = 0 
+Month = 22. Number of squirrels = 15 Number Infected = 3 
+Squirrel 19 has died, pop now = 14 
+Month = 23. Number of squirrels = 14 Number Infected = 2 
+Squirrel 22 has died, pop now = 13 
+S 31 catching infection 
+Month = 24. Number of squirrels = 13 Number Infected = 2 
+Master finishing
+Tracker received shut down message from S 19
+Tracker received shut down message from S 20
+Tracker received shut down message from S 21
+Tracker received shut down message from S 22
+Tracker received shut down message from S 25
+Tracker received shut down message from S 26
+Tracker received shut down message from S 27
+Tracker received shut down message from S 33
+Tracker received shut down message from S 34
+S 33 finishing
+S 22 finishing
+S 25 finishing
+S 27 finishing
+S 20 finishing
+S 26 finishing
+S 34 finishing
+S 19 finishing
+S 21 finishing
+Tracker received shut down message from S 23
+Tracker received shut down message from S 29
+Tracker received shut down message from S 30
+Tracker received shut down message from S 32
+S 29 finishing
+S 30 finishing
+S 23 finishing
+S 32 finishing
+Tracker received shut down message from S 31
+S 31 finishing
+Tracker received shut down message from S 24
+S 24 finishing
+Tracker received shut down message from S 28
+S 28 finishing
+At end of simulation: 13 Squirrels alive
+All squirrels have shut down. Tracker shutting down 
+Tracker 2 finishing
+Cell 3 finishing
+Cell 4 finishing
+Cell 5 finishing
+Cell 6 finishing
+Cell 7 finishing
+Cell 8 finishing
+Cell 9 finishing
+Cell 10 finishing
+Cell 11 finishing
+Cell 12 finishing
+Cell 13 finishing
+Cell 14 finishing
+Cell 15 finishing
+Cell 16 finishing
+Cell 17 finishing
+Cell 18 finishing
+Clock 1 finishing
+AT END OF SIMULATION 

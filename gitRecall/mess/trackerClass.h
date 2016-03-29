@@ -8,6 +8,7 @@ private:
 	
 	int rank;
 	int numLivingSquirrels;
+	int numInfectedSquirrels;
 	long state;
 	int squirrelArray[NUM_SQUIRRELS + MAX_NUM_SQUIRRELS];
 	int squirrelSum;

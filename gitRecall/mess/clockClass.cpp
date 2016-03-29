@@ -21,9 +21,9 @@ void Clock::timer() {
 	int flag =0 ;
 	MPI_Status status;
 	for(month = 1 ; month <= NUM_MONTHS; month++) {
-		sleep(3);
+		sleep(SECONDS_PER_MONTH);
 		endMonth();
-		printf("month = %d num squirrels = %d \n", month, numLivingSquirrels);			
+		printf("Month = %d. Number of squirrels = %d Number Infected = %d \n", month, numLivingSquirrels, numInfectedSquirrels);			
 	}
 	shutdownPool();
 
@@ -38,13 +38,13 @@ void Clock::endMonth(){
 	for(int a= 1 + NUM_EXTRA_ACTORS; a <= NUM_EXTRA_ACTORS + NUM_CELLS; a++) {
 		MPI_Ssend(&month, 1, MPI_INT, a, 888, MPI_COMM_WORLD);
 	}
-	MPI_Status status;
-	int flag =0 ;
-	int incomingMessage[2];
+
+	int incomingMessage[3];
 	MPI_Ssend(&month, 1, MPI_INT, TRACKER_RANK, 771, MPI_COMM_WORLD); //ask tracker how many alive
-	MPI_Recv(&incomingMessage[0], 2, MPI_INT, TRACKER_RANK, 772, MPI_COMM_WORLD, &status); // receive from tracker		
+	MPI_Recv(&incomingMessage[0], 3, MPI_INT, TRACKER_RANK, 772, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // receive from tracker		
 	numLivingSquirrels = incomingMessage[0]; 
-	if(incomingMessage[1] == 1) { //this means too many squirrels are active
+	numInfectedSquirrels = incomingMessage[1];
+	if(incomingMessage[2] == 1) { //this means too many squirrels are active
 		printf("Clock shutting down early %d squirrels alive \n", numLivingSquirrels);
 		month = NUM_MONTHS;
 	}
@@ -56,5 +56,4 @@ void Clock::poisonPill() {
 	for(a = NUM_EXTRA_ACTORS + 1; a <= NUM_EXTRA_ACTORS + NUM_CELLS; a++) {
 		MPI_Ssend(&poison, 1, MPI_INT, a, 999, MPI_COMM_WORLD);
 	}	
-	sleep(1);
 }

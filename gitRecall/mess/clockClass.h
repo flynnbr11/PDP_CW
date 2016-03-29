@@ -9,6 +9,7 @@ class Clock
 		int monthOver;
 		int poison;
 		int numLivingSquirrels;
+		int numInfectedSquirrels;
 	public:
 		Clock();
 		void endMonth();

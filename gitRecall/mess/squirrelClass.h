@@ -48,6 +48,7 @@ class Squirrel
 		int getInfectedValue();
 		int willSquirrelDie();
 		int getSteps();
+		int oneStep(int stop);
 };
 
 #endif

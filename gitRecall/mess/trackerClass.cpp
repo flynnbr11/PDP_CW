@@ -16,6 +16,7 @@ Tracker::Tracker() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 	state = - 1 - rank;
 	numLivingSquirrels = NUM_SQUIRRELS;
+	numInfectedSquirrels = 4;
 	for (int i =0 ; i< NUM_SQUIRRELS + MAX_NUM_SQUIRRELS; i++){
 		squirrelArray[i] = 0;
 	}
@@ -38,11 +39,14 @@ void Tracker::counter() {
 		if(flag == 1) {			
 			sender = status.MPI_SOURCE;
 			tag = status.MPI_TAG;
-			printf("Tracker received tag %d \n", tag);
 			if(tag == 777) {
 				deathMessage(sender, tag, status);
+				numInfectedSquirrels--;
 			}
-
+			else if(tag == 776) { // squirrel has become infected
+				MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
+				numInfectedSquirrels++;				
+			}
 			else if(tag == 778) {
 				birthMessage(sender,tag,status);
 			}
@@ -74,15 +78,16 @@ void Tracker::deathMessage(int sender, int tag, MPI_Status status) {
 
 
 void Tracker::endOfMonth(int sender, int tag, MPI_Status status){
-	int numLivingArray[2];
+	int numLivingArray[3];
 	numLivingArray[0] = numLivingSquirrels;
-	numLivingArray[1] = 0; //will be 1 if too many squirrels and should shut down
+	numLivingArray[1] = numInfectedSquirrels;
+	numLivingArray[2] = 0; //will be 1 if too many squirrels and should shut down
 	if(numLivingSquirrels > MAX_NUM_SQUIRRELS || numLivingSquirrels <= 0 ) {
-		numLivingArray[1] = 1;					
+		numLivingArray[2] = 1;					
 	}
 
 	MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);						
-	MPI_Ssend(&numLivingArray[0], 2, MPI_INT, sender, 772, MPI_COMM_WORLD);
+	MPI_Ssend(&numLivingArray[0], 3, MPI_INT, sender, 772, MPI_COMM_WORLD);
 }
 
 void Tracker::shutDownMessage(int sender, int tag, MPI_Status status) {
@@ -92,7 +97,6 @@ void Tracker::shutDownMessage(int sender, int tag, MPI_Status status) {
 	squirrelSum = 0;
 	for (int i =0 ; i< NUM_SQUIRRELS + MAX_NUM_SQUIRRELS; i++){
 		squirrelSum += squirrelArray[i];
-		if(squirrelArray[i] == 1) printf("Squirrel Array = %d; S %d still alive \n", squirrelSum, i);
 	}
 	printf("Tracker received shut down message from S %d\n", sender);
 

@@ -13,7 +13,7 @@
 using namespace std;
 
 
-static void workerCode();
+static void actorCode();
 static void masterCode();
 void squirrelCode();
 void gridCode();
@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_rank(MPI_COMM_WORLD, &tempRank);
 
 	if (statusCode == 1) { //Workers have statusCode==1
-		workerCode();
+		actorCode();
 	}
 
 	else if (statusCode == 2) { //Master has statusCode==2
@@ -60,7 +60,7 @@ static void masterCode() {
 }	
 
 
-static void workerCode() {
+static void actorCode() {
 		int myRank, parentId;
 		MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 		
@@ -105,34 +105,22 @@ void gridCode() {
 
 
 void squirrelCode(){
-	Squirrel initial;
 	int continueSim=1;
-	int stop = 0;
-	int willDie;
-	int myRank = initial.getRank();
-	initial.run();
+	int stop;
 	while (continueSim == 1 ) {
+		Squirrel alvin;
+		alvin.run();
 		stop = 0;
 		while(stop==0) {
-			if(shouldWorkerStop () == 1) {
-				break; //break out of while(stop)
-				stop = 1;
-			}
-			initial.updateStep();
-			initial.getSquirrelCell();	
-			initial.squirrelToCell();
-			initial.updateValues();
-			initial.giveBirth();
-
-			if(initial.willSquirrelDie() || shouldWorkerStop() ) { 
-				stop = 1;
-			}
-		}
-			
+			stop=alvin.oneStep(stop);
+		}	
 		continueSim = workerSleep();
 	
 		if(continueSim == 0){
+			int myRank = alvin.getRank();
 			MPI_Ssend(&myRank, 1, MPI_INT, TRACKER_RANK, 773, MPI_COMM_WORLD);
 		}
 	}
 }
+
+
