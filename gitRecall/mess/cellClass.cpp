@@ -79,6 +79,8 @@ void Cell::informSquirrel(int sender, int tag, MPI_Status status) {
 
 void Cell::monthlyUpdates(int sender, int tag, MPI_Status status) {
 	MPI_Recv(&month, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
+	printf("Month %d Cell %d PopInflux %d InfLevel %d \n", month, rank, populationInflux, infectionLevel);
+	
 	populationInfluxRecentMonths[month%3] = populationInfluxCurrent; // overwrite oldest each time
 	infectionLevelRecentMonths[month%2] = infectionLevelCurrent;
 	populationInfluxCurrent = 0;

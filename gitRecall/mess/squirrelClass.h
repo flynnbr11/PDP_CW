@@ -1,12 +1,11 @@
 #ifndef SQUIRREL_H
 #define SQUIRREL_H
-
+#include "parameters.h"
 
 class Squirrel
 {
 	private: 
 		long state;
-//		initialiseRNG(long* state);
 		int rank;
 		float x;
 		float y;
@@ -15,8 +14,8 @@ class Squirrel
 		int infectedStep;
 		float avgInfLevel;
 		float avgPopInflux;
-		int populationRecentCells[50];
-		int infectionRecentCells[50];
+		int populationRecentCells[SQUIRREL_NUM_STEPS_RECALLED];
+		int infectionRecentCells[SQUIRREL_NUM_STEPS_RECALLED];
 		int populationCurrentCell;
 		int infectionCurrentCell;
 		int simulationRunning;

@@ -15,6 +15,21 @@ Squirrel::Squirrel(){
 	initialiseRNG(&state);
 }
 
+
+int Squirrel::oneStep(int stop) {
+	updateStep();
+	getSquirrelCell();	
+	squirrelToCell();
+	updateValues();
+	giveBirth();
+	int toDie = willSquirrelDie();
+	int toStop = shouldWorkerStop();
+	if( toDie==1 || toStop==1 ) { 
+		stop = 1;
+	}
+	return stop;
+}
+
 int Squirrel::getRank() {
 	return rank;
 }
@@ -30,19 +45,20 @@ void Squirrel::run() {
 	infected = 0;
 	simulationRunning = 1;
 	numSteps = 0;
-	if( getCommandData() == 0 && rank % 4 == 0) { //give four random squirrels infection
+	int parent = getCommandData();
+	if( parent == 0 && (rank - NUM_CELLS - NUM_EXTRA_ACTORS <  NUM_INITIAL_INFECTION) ) { //give four random squirrels infection
 		infected = 1;
 		infectedStep = 0;
 	}
-	if(getCommandData() != 0 ) {
+	if(parent != 0 ) {
 		int parent = getCommandData();
 		MPI_Recv(&pos[0], 2, MPI_FLOAT, parent, 115, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		x = pos[0]; 
 		y = pos[1];
-		printf("Newborn %d from parent %d. My starting position is x = %f y=%f \n", rank, parent, x,y);
+//		printf("Newborn %d from parent %d. My starting position is x = %f y=%f \n", rank, parent, x,y);
 	}
-	printf("S %d my parent was %d. Initial inf = %d \n", rank, getCommandData(), infected);
-	for(int i = 0; i<50; i++) {
+	printf("Squirrel on rank %d. My parent was %d. Initial infection = %d. Starting Poisition: (%f, %f) \n", rank, parent, infected,x,y);
+	for(int i = 0; i<SQUIRREL_NUM_STEPS_RECALLED; i++) {
 		infectionRecentCells[i]=0;
 		populationRecentCells[i]=0;
 	}
@@ -58,29 +74,14 @@ void Squirrel::squirrelToCell() {
 	MPI_Ssend(&infected, 1, MPI_INT, cellRank, 111, MPI_COMM_WORLD);
 	MPI_Recv(&infectionCurrentCell, 1, MPI_INT, cellRank, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	
 	MPI_Recv(&populationCurrentCell, 1, MPI_INT, cellRank, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	
-	populationRecentCells[numSteps % 50 ] = populationCurrentCell;
-	infectionRecentCells[numSteps % 50] = infectionCurrentCell;
+	populationRecentCells[numSteps % SQUIRREL_NUM_STEPS_RECALLED ] = populationCurrentCell;
+	infectionRecentCells[numSteps % SQUIRREL_NUM_STEPS_RECALLED] = infectionCurrentCell;
 //	MPI_Recv(&cellValues[0], 2, MPI_INT, cellRank, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);	
 //	populationRecentCells[numSteps % 50 ] = cellValues[0];
 //	infectionRecentCells[numSteps % 50] = cellValues[1];
 		
 }
 
-void Squirrel::receive() {
-	MPI_Status status;
-	int sender=-1;
-	MPI_Iprobe(MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &flag, &status);
-	if(flag == 1) {
-		sender = status.MPI_SOURCE;
-		tag = status.MPI_TAG;
-
-		if(tag == 999) {
-			MPI_Recv(&simulationRunning, 1, MPI_INT, sender, 999, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			simulationRunning = 0;
-		}
-		flag = 0;	
-	} 
-}
 
 
 void Squirrel::updateStep() {
@@ -94,14 +95,6 @@ void Squirrel::updateStep() {
 }
 
 
-// receive function deprecated
-void Squirrel::receiveInfectionLevel() {
-	MPI_Recv(&infectionCurrentCell, 1, MPI_INT, cellRank, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	MPI_Recv(&populationCurrentCell, 1, MPI_INT, cellRank, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	populationRecentCells[numSteps % 50 ] = populationCurrentCell;
-	infectionRecentCells[numSteps % 50] = infectionCurrentCell;
-}
-
 int Squirrel::getSimulation() {
 	return simulationRunning;
 }
@@ -109,18 +102,18 @@ int Squirrel::getSimulation() {
 void Squirrel::updateValues() {
 	avgInfLevel = 0;
 	avgPopInflux = 0;
-	for(int i = 0; i < 50; i++) { //could be done more efficiently
+	for(int i = 0; i < SQUIRREL_NUM_STEPS_RECALLED; i++) { //could be done more efficiently
 		avgInfLevel += infectionRecentCells[i];
 		avgPopInflux += populationRecentCells[i];
 	}
-	avgInfLevel = avgInfLevel/50;
-	avgPopInflux = avgPopInflux/50;
+	avgInfLevel = avgInfLevel/SQUIRREL_NUM_STEPS_RECALLED;
+	avgPopInflux = avgPopInflux/SQUIRREL_NUM_STEPS_RECALLED;
 }
 
 void Squirrel::giveBirth() {
 	int workingPid;
 	birth = 0;
-	if(numSteps % 50 == 0) {
+	if(numSteps % BIRTH_CHECK_FREQ == 0) {
 		birth = willGiveBirth(avgPopInflux, &state);
 		if(birth == 1 && shouldWorkerStop() == 0) {
 			workingPid = startWorkerProcess();
@@ -134,7 +127,7 @@ int Squirrel::willSquirrelDie() {
 	death = 0;
 	if(infected == 0) { //does it catch infection
 		if(willCatchDisease(avgInfLevel, &state)==1){
-			printf("S %d catching infection \n", rank);
+			printf("S %d catching infection at step %d \n", rank, numSteps);
 			infected = 1;
 			infectedStep = numSteps;
 			MPI_Ssend(&infected, 1, MPI_INT, TRACKER_RANK, 776, MPI_COMM_WORLD);
@@ -168,18 +161,6 @@ int Squirrel::getInfectedValue() {
 	return infected;
 }	
 
-int Squirrel::oneStep(int stop) {
-	updateStep();
-	getSquirrelCell();	
-	squirrelToCell();
-	updateValues();
-	giveBirth();
-
-	if(willSquirrelDie() || shouldWorkerStop() ) { 
-		stop = 1;
-	}
-	return stop;
-}
 
 
 

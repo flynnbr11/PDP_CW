@@ -10,7 +10,7 @@ private:
 	int numLivingSquirrels;
 	int numInfectedSquirrels;
 	long state;
-	int squirrelArray[NUM_SQUIRRELS + MAX_NUM_SQUIRRELS];
+	int squirrelArray[NUM_CELLS + NUM_EXTRA_ACTORS + NUM_SQUIRRELS + MAX_NUM_SQUIRRELS];
 	int squirrelSum;
 	int continueSim;
 	int incomingMessage;	

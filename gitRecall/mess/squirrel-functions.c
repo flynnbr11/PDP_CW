@@ -5,7 +5,7 @@
 
 #include "ran2.h"
 #include "squirrel-functions.h"
-
+#include "parameters.h" 
 /**
  * Initialises the random number generator, call it once at the start of the program on each process. The input
  * value should be negative, non-zero and different on each process, I suggest something like -1-rank where
@@ -61,6 +61,8 @@ int willCatchDisease(float avg_inf_level, long * state) {
  */
 int willDie(long * state) {
     return(ran2(state)<(0.166666666));
+//    return(ran2(state)<(0.9));
+    	
 }
 
 /**

@@ -8,6 +8,7 @@
 #include "unistd.h"
 using namespace std;
 #include "clockClass.h"
+#include "parameters.h" 
 
 Clock::Clock() {
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -29,7 +30,7 @@ void Clock::timer() {
 
 	MPI_Recv(&numLivingSquirrels, 1, MPI_INT, TRACKER_RANK, 774, MPI_COMM_WORLD, &status); // receive from tracker		
 	printf("At end of simulation: %d Squirrels alive\n", numLivingSquirrels);
-	poisonPill(); //Poison cells explicilty after a while
+	poisonPill(); 
 
 	
 }
@@ -39,13 +40,15 @@ void Clock::endMonth(){
 		MPI_Ssend(&month, 1, MPI_INT, a, 888, MPI_COMM_WORLD);
 	}
 
-	int incomingMessage[3];
+	int incomingMessage[2];
 	MPI_Ssend(&month, 1, MPI_INT, TRACKER_RANK, 771, MPI_COMM_WORLD); //ask tracker how many alive
-	MPI_Recv(&incomingMessage[0], 3, MPI_INT, TRACKER_RANK, 772, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // receive from tracker		
+	MPI_Recv(&incomingMessage[0], 2, MPI_INT, TRACKER_RANK, 772, MPI_COMM_WORLD, MPI_STATUS_IGNORE); // receive from tracker		
 	numLivingSquirrels = incomingMessage[0]; 
 	numInfectedSquirrels = incomingMessage[1];
-	if(incomingMessage[2] == 1) { //this means too many squirrels are active
-		printf("Clock shutting down early %d squirrels alive \n", numLivingSquirrels);
+//	if(incomingMessage[2] == 1) { //this means too many squirrels are active
+	if(numLivingSquirrels > MAX_NUM_SQUIRRELS || numLivingSquirrels < 1) {	
+		if(numLivingSquirrels > MAX_NUM_SQUIRRELS)printf("Simulation shutting down after %d months because number of squirrels too high.\n", month);
+		if(numLivingSquirrels < 1)printf("Simulation shutting down after %d months because all squirrels have died. \n", month);
 		month = NUM_MONTHS;
 	}
 }
