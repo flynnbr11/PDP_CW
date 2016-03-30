@@ -15,8 +15,9 @@ using namespace std;
 
 
 int main(int argc, char* argv[]) {
-
+	double start_time, end_time, total_time;
 	MPI_Init(&argc, &argv);
+	start_time = MPI_Wtime();
 	int statusCode = processPoolInit();
 	int tempRank; 
 	MPI_Comm_rank(MPI_COMM_WORLD, &tempRank);
@@ -30,9 +31,11 @@ int main(int argc, char* argv[]) {
 		printf("Master finishing\n");
 	}		
 	processPoolFinalise();
+	end_time = MPI_Wtime();
 	MPI_Finalize();
 	if(tempRank == 0) {
-		printf("AT END OF SIMULATION \n");
+		total_time = end_time - start_time;
+		printf("AT END OF SIMULATION \n Time = %f seconds \n", total_time);
 	}
 	return 0;
 }
