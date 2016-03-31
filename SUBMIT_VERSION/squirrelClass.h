@@ -20,13 +20,10 @@ class Squirrel
 		int infectionCurrentCell;
 		int simulationRunning;
 		int cellRank;
-		int month;
 		int birth;
 		int death;
-		int eligibleToDie;
 		int flag;
 		int tag;
-		int cellValues[2];
 		float pos[2];
 	public: 
 		Squirrel(); // constructor 
@@ -36,17 +33,10 @@ class Squirrel
 		int getCellRank();
 		void squirrelToCell();
 		void updateStep();
-		void receiveInfectionLevel();
 		int getSimulation();
-		void squirrelPoison();
-		void receive();
 		void updateValues();
 		void giveBirth();
-		int getBirthValue();
-		int getDeathValue();
-		int getInfectedValue();
 		int willSquirrelDie();
-		int getSteps();
 		int oneStep(int stop);
 };
 

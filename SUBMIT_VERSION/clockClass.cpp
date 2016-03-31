@@ -74,9 +74,9 @@ void Clock::endMonth(){
 * Tell cells to shut down. 
 */
 void Clock::poisonPill() {
-	int a;
+	int a, incomingMessage;
 	sleep(2);
 	for(a = NUM_EXTRA_ACTORS + 1; a <= NUM_EXTRA_ACTORS + NUM_CELLS; a++) {
-		MPI_Ssend(&poison, 1, MPI_INT, a, 999, MPI_COMM_WORLD);
+		MPI_Ssend(&incomingMessage, 1, MPI_INT, a, 999, MPI_COMM_WORLD);
 	}	
 }

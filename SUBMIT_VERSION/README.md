@@ -44,6 +44,12 @@ To run locally and copy output into a file
 ```
 $ mpiexec -n 250 ./eco | tee output.dat  
 ```
+Alternatively, run the run script 
+```
+$ chmod u+x run.sh
+$ ./run.sh
+```
+
 
 To run on Morar: first make, then submit the script eco.sge as follows:
 

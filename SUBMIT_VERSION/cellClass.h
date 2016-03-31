@@ -16,21 +16,12 @@ class Cell
 		int tag;
 		int month;
 		int simulationRunning;
-		int cellValues[2];
 	public:
 		Cell();
 		void run();
 		void receiveInfo();
-		int getRank();
-		int getIncomingMessage();
-		void sendValues();
-		void receiveWhileRunning();
-		void printStatus();
-		int getInfectionLevel();
-		int getPopulationInflux();
-		int getSimulation();
-		void monthlyUpdates(int sender, int tag, MPI_Status status);
 		void informSquirrel(int sender, int tag, MPI_Status status);
+		void monthlyUpdates(int sender, int tag, MPI_Status status);
 		void receivePoison (int sender, int tag, MPI_Status status);
 };
 

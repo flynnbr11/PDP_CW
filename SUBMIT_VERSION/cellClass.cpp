@@ -57,7 +57,6 @@ void Cell::receiveInfo() {
 
 void Cell::informSquirrel(int sender, int tag, MPI_Status status) {
 	MPI_Recv(&incomingMessage, 1, MPI_INT, sender, tag, MPI_COMM_WORLD, &status);
-//		MPI_Ssend(&cellValues, 2, MPI_INT, sender, 112, MPI_COMM_WORLD);	
 	MPI_Ssend(&infectionLevel, 1, MPI_INT, sender, 112, MPI_COMM_WORLD);
 	MPI_Ssend(&populationInflux, 1, MPI_INT, sender, 113, MPI_COMM_WORLD);
 	populationInfluxCurrent++;
@@ -78,8 +77,6 @@ void Cell::monthlyUpdates(int sender, int tag, MPI_Status status) {
 	infectionLevelCurrent = 0;
 	infectionLevel = infectionLevelRecentMonths[0] + infectionLevelRecentMonths[1];
 	populationInflux = populationInfluxRecentMonths[0] + populationInfluxRecentMonths[1] + populationInfluxRecentMonths[2];
-	cellValues[0] = populationInflux;
-	cellValues[1] = infectionLevel;
 }
 
 

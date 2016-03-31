@@ -79,6 +79,10 @@ void Squirrel::run() {
 
 }
 
+int Squirrel::getRank() {
+	return rank;
+}	
+
 /*
 * Find out cell the squirrel has landed on.
 * getCellFromPosition() returns an ID between 1 and 16
